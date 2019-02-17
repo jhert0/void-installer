@@ -58,7 +58,7 @@ format_data(){
 }
 
 select_partition(){
-    partitions_list=(`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`);
+    partitions_list=`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`;
     PS3="Select a partition: "
     select partition in $partitions_list; do
         if contains_element $partition; then
