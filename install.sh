@@ -118,7 +118,7 @@ boot_partition(){
                 cfdisk $DISK
                 select_partition "Select boot partition"
                 $BOOT=$PARTITION
-                mkfs.fat -F 32 $BOOT
+                mkfs.vfat -F 32 $BOOT
                 break
                 ;;
             *) echo Invalid;;
@@ -157,4 +157,4 @@ cp ./shared.sh /mnt/
 chroot /mnt ./chroot.sh $RDISK $USR $PASSWORD
 
 # cleanup
-rm /mnt/chroot.sh /mnt/shared.sh
+rm /mnt/chroot.sh
