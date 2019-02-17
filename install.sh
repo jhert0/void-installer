@@ -15,11 +15,6 @@ if [[ $3 == "" ]]; then
     exit 1
 fi
 
-if [[ $4 == "" ]]; then
-    echo "Please enter the password to your account"
-    exit 1
-fi
-
 RDISK=$1 #root disk
 DDISK=$2 #data disk
 PARTITION=""
@@ -31,7 +26,6 @@ SWAP="/dev/mapper/$VOLUME-swap"
 DATA="/dev/mapper/$VOLUME-data"
 
 USR=$3
-PASSWORD=$4
 
 yes_no_prompt(){
     read -p "$1 [y/N] "
@@ -154,7 +148,10 @@ bootstrap
 cp ./chroot.sh /mnt/
 cp ./shared.sh /mnt/
 
-chroot /mnt ./chroot.sh $RDISK $USR $PASSWORD
+chroot /mnt ./chroot.sh $RDISK $USR
 
 # cleanup
 rm /mnt/chroot.sh
+
+echo "If there is anything else you would like to do: run:"
+echo "chroot /mnt /bin/bash"
