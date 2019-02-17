@@ -95,11 +95,11 @@ setup_luks(){
         cryptsetup open $PARTITION data
         pvcreate /dev/mapper/data
         vgextend $VOLUME /dev/mapper/data #add data to the volume
-        lvcreate -l 100%FREE $VOLUME -n data $DDISK
+        lvcreate -l 100%FREE $VOLUME -n data /dev/mapper/data
     fi
 
-    lvcreate -L 4GB $VOLUME -n swap $RDISK
-    lvcreate -l 100%FREE $VOLUME -n root $RDISK
+    lvcreate -L 4GB $VOLUME -n swap /dev/mapper/lvm
+    lvcreate -l 100%FREE $VOLUME -n root /dev/mapper/lvm
 }
 
 boot_partition(){
