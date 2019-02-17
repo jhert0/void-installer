@@ -59,7 +59,7 @@ format_data(){
 
 select_partition(){
     partitions_list=`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`;
-    PS3="Select a partition: "
+    PS3="$1"
     select partition in $partitions_list; do
         if contains_element $partition; then
             yes_no_prompt "Is $partition the correct partition:"
@@ -82,7 +82,7 @@ setup_lvm(){
 setup_luks(){
     echo "Encrypting hard drive..."
 
-    select_partition
+    select_partition "Select root partition"
     cryptsetup luksFormat $PARTITION
     cryptsetup open $PARTITION lvm
     pvcreate /dev/mapper/lvm
@@ -90,7 +90,7 @@ setup_luks(){
     vgcreate $VOLUME /dev/mapper/lvm
 
     if [[ $DDISK != "none" ]]; then
-        select_partition
+        select_partition "Select data partition"
         cryptsetup luksFormat $PARTITION
         cryptsetup open $PARTITION data
         pvcreate /dev/mapper/data
@@ -109,14 +109,14 @@ boot_partition(){
         case "$opt" in
             "n")
                 echo "Using existing boot partition."
-                select_partition
+                select_partition "Select boot partition"
                 BOOT=$PARTITION
                 break
                 ;;
             "y")
                 echo "Going to create a boot partition."
                 cfdisk $DISK
-                select_partition
+                select_partition "Select boot partition"
                 $BOOT=$PARTITION
                 mkfs.fat -F 32 $BOOT
                 break
@@ -127,9 +127,10 @@ boot_partition(){
 }
 
 bootstrap(){
+    mount $ROOT /mnt
+
     mkdir /mnt/{boot,dev,proc,sys}
 
-    mount $ROOT /mnt
     mount $BOOT /mnt/boot
     mount --rbind /dev/ /mnt/dev
     mount --rbind /proc/ /mnt/proc
