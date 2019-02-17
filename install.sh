@@ -73,9 +73,9 @@ select_partition(){
 
 setup_lvm(){
     echo "Please create the lvm."
-    fdisk $RDISK
+    cfdisk $RDISK
     if [[ $DDISK != "none" ]]; then
-        fdisk $DDISK
+        cfdisk $DDISK
     fi
 }
 
@@ -115,7 +115,10 @@ boot_partition(){
                 ;;
             "y")
                 echo "Going to create a boot partition."
-                fdisk $DISK
+                cfdisk $DISK
+                select_partition
+                $BOOT=$PARTITION
+                mkfs.fat -F 32 $BOOT
                 break
                 ;;
             *) echo Invalid;;
