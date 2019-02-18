@@ -78,10 +78,10 @@ setup_luks(){
 
     select_partition "Select root partition"
     cryptsetup luksFormat $PARTITION
-    cryptsetup open $PARTITION lvm
-    pvcreate /dev/mapper/lvm
+    cryptsetup open $PARTITION main
+    pvcreate /dev/mapper/main
 
-    vgcreate $VOLUME /dev/mapper/lvm
+    vgcreate $VOLUME /dev/mapper/main
 
     if [[ $DDISK != "none" ]]; then
         select_partition "Select data partition"
@@ -92,8 +92,8 @@ setup_luks(){
         lvcreate -l 100%FREE $VOLUME -n data /dev/mapper/data
     fi
 
-    lvcreate -L 4GB $VOLUME -n swap /dev/mapper/lvm
-    lvcreate -l 100%FREE $VOLUME -n root /dev/mapper/lvm
+    lvcreate -L 4GB $VOLUME -n swap /dev/mapper/main
+    lvcreate -l 100%FREE $VOLUME -n root /dev/mapper/main
 }
 
 boot_partition(){
@@ -153,5 +153,5 @@ chroot /mnt ./chroot.sh $RDISK $USR
 # cleanup
 rm /mnt/chroot.sh
 
-echo "If there is anything else you would like to do: run:"
+echo "If there is anything else you would like to do run:"
 echo "chroot /mnt /bin/bash"
