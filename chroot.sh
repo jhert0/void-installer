@@ -29,3 +29,9 @@ vim /etc/rc.conf
 
 refind-install
 vim /boot/refind_linux.conf
+
+xbps-install -S void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree
+
+mkdir -p /etc/xbps.d/
+cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
+sed -i 's|https://alpha.de.repo.voidlinux.org|http://alpha.us.repo.voidlinux.org|g' /etc/xbps.d/*-repository-*.conf
