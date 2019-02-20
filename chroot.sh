@@ -30,7 +30,7 @@ echo "Setting hostname to ${HOSTNAME}"
 echo "${HOSTNAME}" > /etc/hostname
 
 echo "Creating user: ${USR}"
-useradd -m -G wheel floppy audio video optical cdrom -s /bin/bash $USR
+useradd -m -G wheel,floppy,audio,video,optical,cdrom -s /bin/bash $USR
 passwd $USR
 
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
@@ -47,7 +47,7 @@ refind-install
 vim /boot/refind_linux.conf
 
 # setup mulilib and nonfree repos
-xbps-install -S void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree
+xbps-install -Sy void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree
 
 # change mirror to one in the united states
 mkdir -p /etc/xbps.d/
@@ -55,4 +55,4 @@ cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
 sed -i 's|https://alpha.de.repo.voidlinux.org|http://alpha.us.repo.voidlinux.org|g' /etc/xbps.d/*-repository-*.conf
 
 # update
-xbps-install -Su
+xbps-install -Suy
