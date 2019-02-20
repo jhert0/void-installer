@@ -27,13 +27,7 @@ DATA="/dev/mapper/$VOLUME-data"
 
 USR=$3
 
-yes_no_prompt(){
-    read -p "$1 [y/N] "
-}
-
-contains_element(){
-    for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
-}
+source shared.sh
 
 create_swap(){
     echo "Creating swap on ${SWAP}..."
@@ -53,7 +47,7 @@ format_data(){
 
 select_partition(){
     partitions_list=`lsblk | grep 'part' | awk '{print "/dev/" substr($1,3)}'`;
-    PS3="$1"
+    PS3="$1: "
     select partition in $partitions_list; do
         if contains_element $partition; then
             yes_no_prompt "Is $partition the correct partition:"
@@ -151,7 +145,11 @@ cp ./shared.sh /mnt/
 chroot /mnt ./chroot.sh $RDISK $USR
 
 # cleanup
-rm /mnt/chroot.sh
+rm /mnt/chroot.sh /mnt/shared.sh
 
 echo "If there is anything else you would like to do run:"
 echo "chroot /mnt /bin/bash"
+
+if [[ $DDISK != "none" ]]; then
+    echo "Don't forget to setup /etc/crypttab and dracut"
+fi
