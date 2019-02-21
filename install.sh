@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ ! -d /sys/firmware/efi ]];then
+    echo "This script does not currently support BIOS mode."
+    exit 1
+fi
+
 if [[ $1 == "" ]]; then
     echo "Please enter the root disk."
     exit 1
