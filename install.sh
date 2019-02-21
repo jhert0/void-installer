@@ -124,7 +124,7 @@ bootstrap(){
     mount --rbind /proc/ /mnt/proc
     mount --rbind /sys/ /mnt/sys
 
-    xbps-install -S -R http://alpha.us.repo.voidlinux.org/current/ -r /mnt base-system lvm2 cryptsetup refind vim
+    xbps-install -Sy -R http://alpha.us.repo.voidlinux.org/current/ -r /mnt base-system lvm2 cryptsetup refind vim
 }
 
 loadkeys us
