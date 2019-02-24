@@ -56,3 +56,5 @@ sed -i 's|https://alpha.de.repo.voidlinux.org|http://alpha.us.repo.voidlinux.org
 
 # update
 xbps-install -Suy
+
+xbps-install -Sy xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice
