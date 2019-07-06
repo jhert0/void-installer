@@ -5,7 +5,7 @@ USR=$1
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
 REPO="http://alpha.us.repo.voidlinux.org"
-PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice"
+PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice curl vpsm"
 KEYMAP="us"
 
 chown root:root /
