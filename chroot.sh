@@ -1,27 +1,15 @@
 #!/bin/bash
 
-DISK=$1
-USR=$2
+USR=$1
 
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
-
-source shared.sh
+REPO="http://alpha.us.repo.voidlinux.org"
+PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice"
+KEYMAP="us"
 
 chown root:root /
 chmod 755 /
-
-interfaces=$(ip -o link show | awk -F': ' '{print $2}')
-PS3="Please select the correct network device: "
-select interface in $interfaces; do
-    if contains_element $interface; then
-        yes_no_prompt "Is $interface the correct network interface:"
-        if [[ $REPLY == "y" ]]; then
-            dhcpcd $interface
-            break
-        fi
-    fi
-done
 
 echo "Setting timezone to ${TIMEZONE}"
 ln -s /usr/share/zoneinfo/$TIMEZONE /etc/localtime
@@ -38,9 +26,12 @@ echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
 xbps-reconfigure -f glibc-locales
 
 # setup fstab
+echo "Setting up /etc/fstab"
 vim /etc/fstab
 
-vim /etc/rc.conf
+echo "Setting up /et/rc.conf"
+echo "TIMEZONE=${TIMEZONE}" >> /etc/rc.conf
+echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
 # install and configure refind
 refind-install
@@ -52,9 +43,9 @@ xbps-install -Sy void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree
 # change mirror to one in the united states
 mkdir -p /etc/xbps.d/
 cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
-sed -i 's|https://alpha.de.repo.voidlinux.org|http://alpha.us.repo.voidlinux.org|g' /etc/xbps.d/*-repository-*.conf
+sed -i 's|https://alpha.de.repo.voidlinux.org|${REPO}|g' /etc/xbps.d/*-repository-*.conf
 
 # update
-xbps-install -Suy
+xbps-install -Syu
 
-xbps-install -Sy xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice
+xbps-install -S $PACKAGES

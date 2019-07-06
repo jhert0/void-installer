@@ -24,6 +24,7 @@ RDISK=$1 #root disk
 DDISK=$2 #data disk
 PARTITION=""
 
+MKSWAP=1
 VOLUME="volume"
 BOOT=""
 ROOT="/dev/mapper/$VOLUME-root"
@@ -32,7 +33,13 @@ DATA="/dev/mapper/$VOLUME-data"
 
 USR=$3
 
-source shared.sh
+yes_no_prompt(){
+    read -p "$1 [y/N] "
+}
+
+contains_element(){
+    for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
+}
 
 create_swap(){
     echo "Creating swap on ${SWAP}..."
@@ -91,7 +98,10 @@ setup_luks(){
         lvcreate -l 100%FREE $VOLUME -n data /dev/mapper/data
     fi
 
-    lvcreate -L 4GB $VOLUME -n swap /dev/mapper/main
+    if [[ $MKSWAP == 1 ]]; then
+        lvcreate -L 4GB $VOLUME -n swap /dev/mapper/main
+    fi
+
     lvcreate -l 100%FREE $VOLUME -n root /dev/mapper/main
 }
 
@@ -138,7 +148,9 @@ boot_partition
 setup_lvm
 setup_luks
 format_root
-create_swap
+if [[ $MKSWAP == 1 ]]; then
+    create_swap
+fi
 if [[ $DDISK != "none" ]]; then
     format_data
 fi
@@ -147,7 +159,7 @@ bootstrap
 cp ./chroot.sh /mnt/
 cp ./shared.sh /mnt/
 
-chroot /mnt ./chroot.sh $RDISK $USR
+chroot /mnt ./chroot.sh $USR
 
 # cleanup
 rm /mnt/chroot.sh /mnt/shared.sh

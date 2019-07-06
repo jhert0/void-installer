@@ -2,11 +2,12 @@
 
 Install script for Void Linux. This install script will create an encrypted install using LVM and LUKS. You can optionally setup a data drive that is also encrypted.
 
-<span style="color: red;">**WARNING:**</span> This script assumes sizes for the root, swap, and data logical volumes, it's setup the way I like but can be changed easily. For more information about the disk setup look at [defaults](#defaults). This script also assumes you are using UEFI, this should be another thing that should be easy to change if you would rather or need to use BIOS.
+This script assumes sizes for the root, swap, and data logical volumes, it's setup the way I like but can be changed easily. For more information about the disk setup look at [defaults](#defaults). This script also assumes you are using UEFI, this should be another thing that should be easy to change if you would rather or need to use BIOS.
 
 ## Usage
 
-Run:
+1. Setup your internet connection.
+2. Run:
 ```bash
 ./install <root disk> <data disk> <username>
 ```
@@ -38,5 +39,5 @@ There will be up to 3 logical volumes created. The root and swap will be on the 
 | name            | size     | physical volume  |
 |-----------------|----------|------------------|
 | root            | 100%FREE | /dev/mapper/main |
-| swap            | 4GB      | /dev/mapper/main |
+| swap (optional) | 4GB      | /dev/mapper/main |
 | data (optional) | 100%FREE | /dev/mapper/data |
