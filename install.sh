@@ -26,6 +26,8 @@ USR=$3 #username
 
 source config.sh
 
+BOOT=""
+
 PARTITION=""
 
 yes_no_prompt(){

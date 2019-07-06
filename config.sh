@@ -3,7 +3,6 @@ DATADRIVE=0
 
 VOLUME="volume"
 
-BOOT=""
 ROOT="/dev/mapper/$VOLUME-root"
 SWAP="/dev/mapper/$VOLUME-swap"
 DATA="/dev/mapper/$VOLUME-data"
