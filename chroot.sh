@@ -34,7 +34,7 @@ uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}'`
 
 # install and configure refind
 refind-install
-echo "\"Boot with standard options\" cryptdevice=$uuid:$VOLUME root=$ROOT rw quiet initrd=/initramfs-%v.img rd.auto init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}" >> /boot/refind_linux.conf
+echo "\"Boot with standard options\" cryptdevice=$uuid:$VOLUME root=$ROOT rw quiet initrd=/initramfs-%v.img rd.auto init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}" > /boot/refind_linux.conf
 
 # setup mulilib and nonfree repos
 xbps-install -Sy $REPOS
