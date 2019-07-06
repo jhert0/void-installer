@@ -152,12 +152,12 @@ fi
 bootstrap
 
 cp ./chroot.sh /mnt/
-cp ./shared.sh /mnt/
+cp ./config.sh  /mnt/
 
 chroot /mnt ./chroot.sh $RDISK $USR
 
 # cleanup
-rm /mnt/chroot.sh /mnt/shared.sh
+rm /mnt/chroot.sh /mnt/config.sh
 
 echo "If there is anything else you would like to do run:"
 echo "chroot /mnt /bin/bash"
