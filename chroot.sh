@@ -1,12 +1,9 @@
 #!/bin/bash
 
+RDISK=$1
 USR=$1
 
-HOSTNAME="localhost"
-TIMEZONE="America/Chicago"
-REPO="http://alpha.us.repo.voidlinux.org"
-PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice curl vpsm"
-KEYMAP="us"
+source config.sh
 
 chown root:root /
 chmod 755 /
@@ -33,12 +30,14 @@ echo "Setting up /et/rc.conf"
 echo "TIMEZONE=${TIMEZONE}" >> /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
+uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}'`
+
 # install and configure refind
 refind-install
-vim /boot/refind_linux.conf
+echo "\"Boot with standard options\" cryptdevice=$uuid:$VOLUME root=$ROOT rw quiet initrd=/initramfs-%v.img rd.auto init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}" >> /boot/refind_linux.conf
 
 # setup mulilib and nonfree repos
-xbps-install -Sy void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree
+xbps-install -Sy $REPOS
 
 # change mirror to one in the united states
 mkdir -p /etc/xbps.d/
@@ -48,4 +47,4 @@ sed -i 's|https://alpha.de.repo.voidlinux.org|${REPO}|g' /etc/xbps.d/*-repositor
 # update
 xbps-install -Syu
 
-xbps-install -S $PACKAGES
+xbps-install -Sy $PACKAGES

@@ -22,16 +22,11 @@ fi
 
 RDISK=$1 #root disk
 DDISK=$2 #data disk
+USR=$3 #username
+
+source config.sh
+
 PARTITION=""
-
-MKSWAP=1
-VOLUME="volume"
-BOOT=""
-ROOT="/dev/mapper/$VOLUME-root"
-SWAP="/dev/mapper/$VOLUME-swap"
-DATA="/dev/mapper/$VOLUME-data"
-
-USR=$3
 
 yes_no_prompt(){
     read -p "$1 [y/N] "
@@ -95,14 +90,14 @@ setup_luks(){
         cryptsetup open $PARTITION data
         pvcreate /dev/mapper/data
         vgextend $VOLUME /dev/mapper/data #add data to the volume
-        lvcreate -l 100%FREE $VOLUME -n data /dev/mapper/data
+        lvcreate -l $DATASIZE $VOLUME -n data /dev/mapper/data
     fi
 
     if [[ $MKSWAP == 1 ]]; then
-        lvcreate -L 4GB $VOLUME -n swap /dev/mapper/main
+        lvcreate -L $SWAPSIZE $VOLUME -n swap /dev/mapper/main
     fi
 
-    lvcreate -l 100%FREE $VOLUME -n root /dev/mapper/main
+    lvcreate -l $ROOTSIZE $VOLUME -n root /dev/mapper/main
 }
 
 boot_partition(){
@@ -159,7 +154,7 @@ bootstrap
 cp ./chroot.sh /mnt/
 cp ./shared.sh /mnt/
 
-chroot /mnt ./chroot.sh $USR
+chroot /mnt ./chroot.sh $RDISK $USR
 
 # cleanup
 rm /mnt/chroot.sh /mnt/shared.sh
