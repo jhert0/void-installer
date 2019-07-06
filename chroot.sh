@@ -27,7 +27,7 @@ echo "Setting up /etc/fstab"
 vim /etc/fstab
 
 echo "Setting up /et/rc.conf"
-echo "TIMEZONE=${TIMEZONE}" >> /etc/rc.conf
+echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
 uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}'`
