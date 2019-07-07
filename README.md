@@ -1,8 +1,6 @@
 # void-installer
 
-Install script for Void Linux. This install script will create an encrypted install using LVM and LUKS. You can optionally setup a data drive that is also encrypted.
-
-This script assumes sizes for the root, swap, and data logical volumes, it's setup the way I like but can be changed easily. For more information about the disk setup look at [defaults](#defaults). This script also assumes you are using UEFI, this should be another thing that should be easy to change if you would rather or need to use BIOS.
+Install script for Void Linux. This install script will create an encrypted install using LVM and LUKS. You can optionally setup a data drive that is also encrypted. Currently this script does not support BIOS mode.
 
 ## Usage
 
@@ -22,10 +20,14 @@ If you do not want to setup a data drive then pass none instead. Example:
 ./install /dev/sda none endoffile
 ```
 
+## Configuration
+
+Included in this repo is a configuration file where you can change things such as the size of the partitions, timezone, keymap, etc. Below you can see the [defaults](#defaults).
+
 <a href="#defaults"></a>
 ## Defaults
 
-This is what the script will create on the LVM partition.
+This is what the script will create on the LVM partition using the default configuration.
 
 There will be 2 physical volumes created in the volume group called `volume`.
 
@@ -34,7 +36,7 @@ There will be 2 physical volumes created in the volume group called `volume`.
 | main | volume       |
 | data | volume       |
 
-There will be up to 3 logical volumes created. The root and swap will be on the main physical volume and the data logical volume will be created on the data physical volume.
+There will be up to 3 logical volumes created. The root and swap will be on the main physical volume and the data logical volume will be created on the data physical volume. Swap is optional but by default it it will be created, change the `MKSWAP` variable to 0 to disable creating the swap.
 
 | name            | size     | physical volume  |
 |-----------------|----------|------------------|
