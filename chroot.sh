@@ -24,7 +24,12 @@ xbps-reconfigure -f glibc-locales
 
 # setup fstab
 echo "Setting up /etc/fstab"
-vim /etc/fstab
+echo "${ROOT}  / ext4  rw,relatime  0 1" > /etc/fstab
+echo "${BOOT}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+if [[ $MKSWAWP == 1 ]]; then
+    echo "${SWAP}  none  swap  defaults  0 0" >> /etc/fstab
+fi
+echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
 
 echo "Setting up /et/rc.conf"
 echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf

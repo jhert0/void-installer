@@ -26,8 +26,6 @@ USR=$3 #username
 
 source config.sh
 
-BOOT=""
-
 PARTITION=""
 
 yes_no_prompt(){
@@ -154,7 +152,7 @@ fi
 bootstrap
 
 cp ./chroot.sh /mnt/
-cp ./config.sh  /mnt/
+cp ./config.sh /mnt/
 
 chroot /mnt ./chroot.sh $RDISK $USR
 
