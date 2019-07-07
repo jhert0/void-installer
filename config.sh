@@ -1,5 +1,4 @@
 MKSWAP=1
-DATADRIVE=0
 
 VOLUME="volume"
 
@@ -15,6 +14,6 @@ DATASIZE="100%FREE"
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
 REPO="http://alpha.us.repo.voidlinux.org"
-PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice curl vpsm"
+PACKAGES="xorg cinnamon emacs-gtk3 git zsh tmux firefox rxvt-unicode weechat mpd ncmpcpp gnupg2 libreoffice curl vpsm vim"
 KEYMAP="us"
 REPOS="void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree"
