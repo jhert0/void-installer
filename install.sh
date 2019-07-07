@@ -137,7 +137,7 @@ bootstrap(){
     xbps-install -Sy -R http://alpha.us.repo.voidlinux.org/current/ -r /mnt base-system lvm2 cryptsetup refind vim
 }
 
-loadkeys us
+loadkeys $KEYMAP
 
 boot_partition
 setup_lvm
