@@ -26,7 +26,7 @@ xbps-reconfigure -f glibc-locales
 echo "Setting up /etc/fstab"
 echo "${ROOT}  / ext4  rw,relatime  0 1" > /etc/fstab
 echo "${BOOT}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
-if [[ $MKSWAWP == 1 ]]; then
+if [[ $MKSWAP == 1 ]]; then
     echo "${SWAP}  none  swap  defaults  0 0" >> /etc/fstab
 fi
 echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
