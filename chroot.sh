@@ -1,7 +1,7 @@
 #!/bin/bash
 
 RDISK=$1
-USR=$1
+USR=$2
 
 source config.sh
 
@@ -47,7 +47,7 @@ xbps-install -Sy $REPOS
 # change mirror to one in the united states
 mkdir -p /etc/xbps.d/
 cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
-sed -i 's|https://alpha.de.repo.voidlinux.org|${REPO}|g' /etc/xbps.d/*-repository-*.conf
+sed -i "s|https://alpha.de.repo.voidlinux.org|$REPO|g" /etc/xbps.d/*-repository-*.conf
 
 # update
 xbps-install -Syu
