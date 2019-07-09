@@ -17,7 +17,11 @@ echo "${HOSTNAME}" > /etc/hostname
 
 echo "Creating user: ${USR}"
 useradd -m -G wheel,floppy,audio,video,optical,cdrom -s /bin/bash $USR
+echo "Changing password for ${USR}"
 passwd $USR
+
+echo "Chaning password for root"
+passwd root
 
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
@@ -32,7 +36,7 @@ if [[ $MKSWAP == 1 ]]; then
 fi
 echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
 
-echo "Setting up /et/rc.conf"
+echo "Setting up /etc/rc.conf"
 echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
@@ -40,7 +44,7 @@ uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr
 
 # install and configure refind
 refind-install
-echo "\"Boot with standard options\" cryptdevice=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}" > /boot/refind_linux.conf
+echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 
 # setup mulilib and nonfree repos
 xbps-install -Sy $REPOS
