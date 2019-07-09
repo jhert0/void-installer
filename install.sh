@@ -154,7 +154,7 @@ bootstrap
 cp ./chroot.sh /mnt/
 cp ./config.sh /mnt/
 
-chroot /mnt ./chroot.sh $RDISK $USR
+chroot /mnt ./chroot.sh $RDISK $USR $BOOT
 
 # cleanup
 rm /mnt/chroot.sh /mnt/config.sh
