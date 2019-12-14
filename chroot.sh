@@ -58,3 +58,6 @@ sed -i "s|https://alpha.de.repo.voidlinux.org|$REPO|g" /etc/xbps.d/*-repository-
 xbps-install -Syu
 
 xbps-install -Sy $PACKAGES
+
+echo "Setting up services"
+ln -s /etc/sv/dbus/ /var/service/
