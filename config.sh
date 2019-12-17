@@ -11,6 +11,8 @@ ROOTSIZE="100%FREE"
 SWAPSIZE="4G"
 DATASIZE="100%FREE"
 
+INTERFACE="eno1"
+
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
 REPO="http://alpha.us.repo.voidlinux.org"

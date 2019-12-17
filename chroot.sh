@@ -6,6 +6,8 @@ BOOTPART=$3
 
 source config.sh
 
+dhcpcd $INTERFACE
+
 chown root:root /
 chmod 755 /
 
