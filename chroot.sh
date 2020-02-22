@@ -19,6 +19,8 @@ echo "${HOSTNAME}" > /etc/hostname
 
 echo "Creating user: ${USR}"
 useradd -m -G wheel,floppy,audio,video,optical,cdrom -s /bin/bash $USR
+pwconv
+
 echo "Changing password for ${USR}"
 passwd $USR
 
