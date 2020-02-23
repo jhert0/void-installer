@@ -14,6 +14,8 @@ chmod 755 /
 echo "Setting timezone to ${TIMEZONE}"
 ln -s /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
+ntpdate -s time.nist.gov
+
 echo "Setting hostname to ${HOSTNAME}"
 echo "${HOSTNAME}" > /etc/hostname
 
@@ -64,5 +66,5 @@ xbps-install -Syu
 xbps-install -Sy $PACKAGES
 
 echo "Setting up services"
-ln -s /etc/sv/dbus/ /var/service/
+ln -s /etc/sv/dbus /var/service/
 ln -s /etc/sv/connmand /var/service/

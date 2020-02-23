@@ -134,7 +134,9 @@ bootstrap(){
     mount --rbind /proc/ /mnt/proc
     mount --rbind /sys/ /mnt/sys
 
-    xbps-install -Sy -R "$REPO/current/" -r /mnt base-system lvm2 cryptsetup refind
+    xbps-install -Sy -R "$REPO/current/" -r /mnt base-system lvm2 cryptsetup refind ntp
+    xbps-reconfigure -r /mnt -f base-files
+    chroot /mnt xbps-reconfigure -a
 }
 
 loadkeys $KEYMAP
