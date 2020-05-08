@@ -1,8 +1,10 @@
 #!/bin/bash
 
-if [[ ! -d /sys/firmware/efi ]];then
-    echo "This script does not currently support BIOS mode."
-    exit 1
+if [[ $UEFI -eq 1 ]]; then
+    if [[ ! -d /sys/firmware/efi ]];then
+        echo "Script set to install uefi compatible bootloader but you did not boot using uefi"
+        exit 1
+    fi
 fi
 
 if [[ $1 == "" ]]; then
@@ -129,19 +131,28 @@ bootstrap(){
 
     mkdir /mnt/{boot,dev,proc,sys}
 
-    mount $BOOT /mnt/boot
+    if [[ $UEFI -eq 1 ]]; then
+        mount $BOOT /mnt/boot
+    fi
     mount --rbind /dev/ /mnt/dev
     mount --rbind /proc/ /mnt/proc
     mount --rbind /sys/ /mnt/sys
 
-    xbps-install -Sy -R "$REPO/current/" -r /mnt base-system lvm2 cryptsetup refind ntp
+    BOOTLOADER="refind"
+    if [[ $UEFI -eq 0 ]]; then
+        BOOTLOADER="grub"
+    fi
+
+    xbps-install -Sy -R "$REPO/current/" -r /mnt base-system lvm2 cryptsetup ntp $BOOTLOADER
     xbps-reconfigure -r /mnt -f base-files
     chroot /mnt xbps-reconfigure -a
 }
 
 loadkeys $KEYMAP
 
-boot_partition
+if [[ $UEFI -eq 1 ]]; then
+    boot_partition
+fi
 setup_lvm
 setup_luks
 format_root

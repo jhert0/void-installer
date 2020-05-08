@@ -13,6 +13,8 @@ DATASIZE="100%FREE"
 
 INTERFACE="eno1"
 
+UEFI=1
+
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
 REPO="http://alpha.us.repo.voidlinux.org"

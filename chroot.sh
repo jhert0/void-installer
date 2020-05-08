@@ -36,7 +36,9 @@ xbps-reconfigure -f glibc-locales
 # setup fstab
 echo "Setting up /etc/fstab"
 echo "${ROOT}  / ext4  rw,relatime  0 1" > /etc/fstab
-echo "${BOOTPART}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+if [[ $UEFI -eq 1 ]]; then
+    echo "${BOOTPART}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+fi
 if [[ $MKSWAP == 1 ]]; then
     echo "${SWAP}  none  swap  defaults  0 0" >> /etc/fstab
 fi
@@ -46,11 +48,15 @@ echo "Setting up /etc/rc.conf"
 echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
-uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
-
-# install and configure refind
-refind-install
-echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
+if [[ $UEIF -eq 1 ]]; then
+    uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
+    # install and configure refind
+    refind-install
+    echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
+else
+    grub-install --target i386-pc $RDISK
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
 
 # setup mulilib and nonfree repos
 xbps-install -Sy $REPOS
