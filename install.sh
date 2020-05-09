@@ -148,7 +148,7 @@ bootstrap(){
         BOOTLOADER="grub"
     fi
 
-    xbps-install -Sy -r /mnt base-system lvm2 cryptsetup ntp $BOOTLOADER
+    xbps-install -Sy -R "$REPO/current/" -r /mnt base-system lvm2 cryptsetup ntp $BOOTLOADER
     xbps-reconfigure -r /mnt -f base-files
     chroot /mnt xbps-reconfigure -a
 }
