@@ -1,4 +1,5 @@
 MKSWAP=1
+UEFI=1
 
 VOLUME="volume"
 
@@ -12,8 +13,6 @@ SWAPSIZE="4G"
 DATASIZE="100%FREE"
 
 INTERFACE="eno1"
-
-UEFI=1
 
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"

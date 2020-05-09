@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ $# -ne 3 ]]; then
+    echo "Usage: $0 <root disk> <data disk|none> <username>"
+    exit 1
+fi
+
 if [[ $UEFI -eq 1 ]]; then
     if [[ ! -d /sys/firmware/efi ]];then
         echo "Script set to install uefi compatible bootloader but you did not boot using uefi"
@@ -148,6 +153,15 @@ bootstrap(){
     chroot /mnt xbps-reconfigure -a
 }
 
+echo "Root disk: $RDISK"
+echo "Data disk: $DDISK"
+echo "Username: $USR"
+yes_no_prompt "Does the information above look correct"
+if [[ $REPLY -eq "n" ]]; then
+    echo "Aborting"
+    exit 0
+fi
+
 loadkeys $KEYMAP
 
 if [[ $UEFI -eq 1 ]]; then
@@ -172,6 +186,7 @@ chroot /mnt ./chroot.sh $RDISK $USR $BOOT
 # cleanup
 rm /mnt/chroot.sh /mnt/config.sh
 
+echo
 echo "If there is anything else you would like to do run:"
 echo "chroot /mnt /bin/bash"
 
