@@ -1,5 +1,6 @@
 MKSWAP=1
 UEFI=1
+MUSL=0
 
 VOLUME="volume"
 
