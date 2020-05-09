@@ -163,7 +163,7 @@ echo "Root disk: $RDISK"
 echo "Data disk: $DDISK"
 echo "Username: $USR"
 yes_no_prompt "Does the information above look correct"
-if [[ $REPLY -eq "n" ]]; then
+if [[ $REPLY == "n" ]]; then
     echo "Aborting"
     exit 0
 fi
