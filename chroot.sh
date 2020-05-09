@@ -54,6 +54,8 @@ if [[ $UEIF -eq 1 ]]; then
     refind-install
     echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 else
+    echo "GRUB_PRELOAD_MODULES=\"lvm\"" >> /etc/default/grub
+    echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
     grub-install --target i386-pc $RDISK
     grub-mkconfig -o /boot/grub/grub.cfg
 fi
