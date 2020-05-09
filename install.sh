@@ -84,8 +84,14 @@ setup_lvm(){
 setup_luks(){
     echo "Encrypting hard drive..."
 
+    luks_type="luks"
+    if [[ $UEFI -eq 0 ]]; then
+        echo "Using grub as bootloader switching to luks1"
+        luks_type="luks1"
+    fi
+
     select_partition "Select root partition"
-    cryptsetup luksFormat $PARTITION
+    cryptsetup luksFormat $PARTITION --type $luks_type
     cryptsetup open $PARTITION main
     pvcreate /dev/mapper/main
 
@@ -94,7 +100,7 @@ setup_luks(){
     if [[ $DDISK != "none" ]]; then
         select_partition "Select data partition"
         cryptsetup luksFormat $PARTITION
-        cryptsetup open $PARTITION data
+        cryptsetup open $PARTITION data --type $luks_type
         pvcreate /dev/mapper/data
         vgextend $VOLUME /dev/mapper/data #add data to the volume
         lvcreate -l $DATASIZE $VOLUME -n data /dev/mapper/data
