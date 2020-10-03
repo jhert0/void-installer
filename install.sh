@@ -126,7 +126,7 @@ boot_partition(){
                 ;;
             "y")
                 echo "Going to create a boot partition."
-                cfdisk $DISK
+                cfdisk $RDISK
                 select_partition "Select boot partition"
                 BOOT=$PARTITION
                 mkfs.vfat -F 32 $BOOT
