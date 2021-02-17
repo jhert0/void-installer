@@ -17,8 +17,20 @@ INTERFACE="eno1"
 
 HOSTNAME="localhost"
 TIMEZONE="America/Chicago"
-REPO="http://alpha.us.repo.voidlinux.org"
-PACKAGES="base-devel xorg emacs-gtk3 git zsh tmux firefox alacritty mpd ncmpcpp gnupg2 libreoffice curl vpsm neovim connman connman-gtk"
-PACKAGES+=" pulseaudio pinentry-gtk zip unzip font-iosevka feh python gnome-disk-utility greybird-themes font-symbola dunst aerc htop ripgrep"
 KEYMAP="us"
+
+# Packages
+
+REPO="http://alpha.us.repo.voidlinux.org"
 REPOS="void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree"
+
+DE="xfce4"
+DE_EXTRAS="xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin libreoffice pinentry-gtk gnome-disk-utility greybird-themes connman-gtk firefox alacritty"
+
+SHELL="zsh"
+
+DEVELOPMENT="base-devel git emacs-gtk3 neovim"
+
+PACKAGES="tmux mpd ncmpcpp gnupg2 curl vpsm connman "
+PACKAGES+=" pulseaudio zip unzip font-iosevka feh python dunst aerc htop ripgrep picom"
+PACKAGES+=" ${DE} ${DE_EXTRAS} ${SHELL} ${DEVELOPMENT}"
