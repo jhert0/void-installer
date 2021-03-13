@@ -31,6 +31,6 @@ SHELL="zsh"
 
 DEVELOPMENT="base-devel git emacs-gtk3 neovim"
 
-PACKAGES="tmux mpd ncmpcpp gnupg2 curl vpsm connman "
+PACKAGES="tmux mpd ncmpcpp gnupg2 curl vpsm connman rsync "
 PACKAGES+=" pulseaudio zip unzip font-iosevka feh python dunst aerc htop ripgrep picom"
 PACKAGES+=" ${DE} ${DE_EXTRAS} ${SHELL} ${DEVELOPMENT}"
