@@ -98,9 +98,9 @@ mount_filesytems(){
 
     # create seperate subvolumes for log, cache, and tmp to prevent them
     # from being in snapshots of the root subvolume
-    btrfs subvolume /mnt/var/log
-    btrfs subvolume /mnt/var/cache
-    btrfs subvolume /mnt/var/tmp
+    btrfs subvolume create /mnt/var/log
+    btrfs subvolume create /mnt/var/cache
+    btrfs subvolume create /mnt/var/tmp
 
     mount $BOOT /mnt/boot
 
@@ -117,8 +117,8 @@ mount_filesytems(){
         mount -o $BTRFS_OPTS,subvol=@vault /mnt/mnt/vault
         mount -o $BTRFS_OPTS,subvol=@snapshots /mnt/mnt/snapshots
 
-        btrfs subvolume /mnt/mnt/vault/storage
-        btrfs subvolume /mnt/mnt/vault/vms
+        btrfs subvolume create /mnt/mnt/vault/storage
+        btrfs subvolume create /mnt/mnt/vault/vms
     fi
 }
 
@@ -126,16 +126,16 @@ setup_btrfs(){
     mkfs.btrfs -L root -d single -m single $ROOT
 
     mount -o $BTRFS_OPTS $ROOT /mnt
-    btrfs subvolume /mnt/@
-    btrfs subvolume /mnt/@home
+    btrfs subvolume create /mnt/@
+    btrfs subvolume create /mnt/@home
     umount /mnt
 
     if [[ $DDISK != "" ]]; then
         mkfs.btrfs -L data -d single -m dup $DATA
 
         mount -o $BTRFS_OPTS $DATA /mnt
-        btrfs subvolume /mnt/@vault
-        btrfs subvolume /mnt/@snapshots
+        btrfs subvolume create /mnt/@vault
+        btrfs subvolume create /mnt/@snapshots
         umount /mnt
     fi
 }
