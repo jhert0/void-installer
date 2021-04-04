@@ -1,17 +1,10 @@
 MKSWAP=1
-UEFI=1
 MUSL=0
 
-VOLUME="volume"
+ROOTLUKS="tank"
+DATALUKS="data"
 
-BOOT=""
-ROOT="/dev/mapper/$VOLUME-root"
-SWAP="/dev/mapper/$VOLUME-swap"
-DATA="/dev/mapper/$VOLUME-data"
-
-ROOTSIZE="100%FREE"
-SWAPSIZE="4G"
-DATASIZE="100%FREE"
+BTRFS_OPTS="rw,noatime,compress=zstd,space_cache,commit=120"
 
 INTERFACE="eno1"
 

@@ -1,8 +1,10 @@
 #!/bin/bash
 
 RDISK=$1
-USR=$2
-BOOTPART=$3
+ROOT=$2
+BOOT=$3
+DATA=$4
+USR=$5
 
 source config.sh
 
@@ -35,13 +37,21 @@ xbps-reconfigure -f glibc-locales
 
 # setup fstab
 echo "Setting up /etc/fstab"
-echo "${ROOT}  / ext4  rw,relatime  0 1" > /etc/fstab
-if [[ $UEFI -eq 1 ]]; then
-    echo "${BOOTPART}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
-fi
+
+echo "${ROOT}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
+echo "${ROOT}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" > /etc/fstab
+echo "${ROOT}  /.snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" > /etc/fstab
+echo "${BOOT}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+
 if [[ $MKSWAP == 1 ]]; then
     echo "${SWAP}  none  swap  defaults  0 0" >> /etc/fstab
 fi
+
+if [[ $DATA != "" ]]; then
+    echo "${DATA}  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
+    echo "data ${DATA} /root/data.key" > /etc/crypttab
+fi
+
 echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
 
 echo "Setting up /etc/rc.conf"
@@ -52,15 +62,10 @@ if [[ $UEFI -eq 1 ]]; then
     uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
     # install and configure refind
     refind-install
-    echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${VOLUME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
-else
-    echo "GRUB_PRELOAD_MODULES=\"lvm\"" >> /etc/default/grub
-    echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
-    grub-install --target i386-pc $RDISK
-    grub-mkconfig -o /boot/grub/grub.cfg
+    echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${LUKSNAME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 fi
 
-# setup mulilib and nonfree repos
+# setup extra repos
 xbps-install -Sy $REPOS
 
 # change mirror to one in the united states
@@ -68,7 +73,5 @@ mkdir -p /etc/xbps.d/
 cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
 sed -i "s|https://alpha.de.repo.voidlinux.org|$REPO|g" /etc/xbps.d/*-repository-*.conf
 
-# update
 xbps-install -Syu
-
 xbps-install -Sy $PACKAGES

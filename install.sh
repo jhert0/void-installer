@@ -5,11 +5,9 @@ if [[ $# -ne 3 ]]; then
     exit 1
 fi
 
-if [[ $UEFI -eq 1 ]]; then
-    if [[ ! -d /sys/firmware/efi ]];then
-        echo "Script set to install uefi compatible bootloader but you did not boot using uefi"
-        exit 1
-    fi
+if [[ ! -d /sys/firmware/efi ]];then
+    echo "Script set to install uefi compatible bootloader but you did not boot using uefi"
+    exit 1
 fi
 
 if [[ $1 == "" ]]; then
@@ -35,28 +33,17 @@ source config.sh
 
 PARTITION=""
 
+BOOT=""
+ROOT=""
+HOME=""
+DATA=""
+
 yes_no_prompt(){
     read -p "$1 [y/N] "
 }
 
 contains_element(){
     for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
-}
-
-create_swap(){
-    echo "Creating swap on ${SWAP}..."
-    mkswap $SWAP
-    swapon $SWAP
-}
-
-format_root(){
-    echo "Formatting ${ROOT}..."
-    mkfs.ext4 $ROOT
-}
-
-format_data(){
-    echo "Formatting ${DATA}..."
-    mkfs.ext4 $DATA
 }
 
 select_partition(){
@@ -73,44 +60,84 @@ select_partition(){
     done
 }
 
-setup_lvm(){
-    echo "Please create the lvm."
+config_disks(){
     cfdisk $RDISK
+
     if [[ $DDISK != "none" ]]; then
         cfdisk $DDISK
     fi
 }
 
 setup_luks(){
-    echo "Encrypting hard drive..."
-
-    luks_type="luks"
-    if [[ $UEFI -eq 0 ]]; then
-        echo "Using grub as bootloader switching to luks1"
-        luks_type="luks1"
-    fi
-
     select_partition "Select root partition"
-    cryptsetup luksFormat $PARTITION --type $luks_type
-    cryptsetup open $PARTITION main
-    pvcreate /dev/mapper/main
 
-    vgcreate $VOLUME /dev/mapper/main
+    echo "Encrypting ${PARTITION}..."
+    cryptsetup luksFormat $PARTITION
+    cryptsetup open $PARTITION $ROOTLUKS
 
     if [[ $DDISK != "none" ]]; then
         select_partition "Select data partition"
-        cryptsetup luksFormat $PARTITION
-        cryptsetup open $PARTITION data --type $luks_type
-        pvcreate /dev/mapper/data
-        vgextend $VOLUME /dev/mapper/data #add data to the volume
-        lvcreate -l $DATASIZE $VOLUME -n data /dev/mapper/data
+
+        dd if=/dev/random of=data.key bs=1 count=32
+
+        cryptsetup luksFormat $PARTITION data.key
+        cryptsetup open $PARTITION $DATALUKS --key-file data.key
+
+        DATA=/dev/mapper/$DATALUKS
     fi
 
-    if [[ $MKSWAP == 1 ]]; then
-        lvcreate -L $SWAPSIZE $VOLUME -n swap /dev/mapper/main
-    fi
+    ROOT=/dev/mapper/$ROOTLUKS
+}
 
-    lvcreate -l $ROOTSIZE $VOLUME -n root /dev/mapper/main
+mount_filesytems(){
+    mkdir -p /mnt/{boot,dev,proc,sys,home,mnt,.snapshots}
+
+    mount -o $BTRFS_OPTS,subvol=@ $ROOT /mnt
+    mount -o $BTRFS_OPTS,subvol=@home $ROOT /mnt/home
+    mount -o $BTRFS_OPTS,subvol=@snapshots $ROOT /mnt/.snapshots
+
+    # create seperate subvolumes for log, cache, and tmp to prevent them
+    # from being in snapshots of the root subvolume
+    btrfs subvolume /mnt/var/log
+    btrfs subvolume /mnt/var/cache
+    btrfs subvolume /mnt/var/tmp
+
+    mount $BOOT /mnt/boot
+
+    mount --rbind /dev/ /mnt/dev
+    mount --rbind /proc/ /mnt/proc
+    mount --rbind /sys/ /mnt/sys
+
+    if [[ $DDISK != "none" ]]; then
+        # move the key for the data drive to the root filesystem
+        mkdir -p /mnt/root
+        mv data.key /mnt/root
+
+        mkdir /mnt/mnt/{vault,snapshots}
+        mount -o $BTRFS_OPTS,subvol=@vault /mnt/mnt/vault
+        mount -o $BTRFS_OPTS,subvol=@snapshots /mnt/mnt/snapshots
+
+        btrfs subvolume /mnt/mnt/vault/storage
+        btrfs subvolume /mnt/mnt/vault/vms
+    fi
+}
+
+setup_btrfs(){
+    mkfs.btrfs -L root -d single -m single $ROOT
+
+    mount -o $BTRFS_OPTS $ROOT /mnt
+    btrfs subvolume /mnt/@
+    btrfs subvolume /mnt/@home
+    umount /mnt
+
+    if [[ $DDISK != "" ]]; then
+        mkfs.btrfs -L data -d single -m dup $DATA
+
+        mount -o $BTRFS_OPTS $DATA /mnt
+        btrfs subvolume /mnt/@vault
+        btrfs subvolume /mnt/@snapshots
+        umount /mnt
+    fi
 }
 
 boot_partition(){
@@ -138,68 +165,47 @@ boot_partition(){
 }
 
 bootstrap(){
-    mount $ROOT /mnt
-
-    mkdir /mnt/{boot,dev,proc,sys}
-
-    if [[ $UEFI -eq 1 ]]; then
-        mount $BOOT /mnt/boot
-    fi
-    mount --rbind /dev/ /mnt/dev
-    mount --rbind /proc/ /mnt/proc
-    mount --rbind /sys/ /mnt/sys
-
-    BOOTLOADER="refind"
-    if [[ $UEFI -eq 0 ]]; then
-        BOOTLOADER="grub"
-    fi
-
     repo="$REPO/current/"
     if [[ $MUSL -eq 1 ]]; then
         repo="$REPO/current/musl/"
     fi
 
-    xbps-install -Sy -R $repo -r /mnt base-system lvm2 cryptsetup ntp $BOOTLOADER
+    xbps-install -Sy -R $repo -r /mnt base-system btrfs-progs cryptsetup ntp refind
     xbps-reconfigure -r /mnt -f base-files
     chroot /mnt xbps-reconfigure -a
 }
 
-echo "Root disk: $RDISK"
-echo "Data disk: $DDISK"
-echo "Username: $USR"
+echo "------------------------------------------------"
+echo "Username: ${USR}"
+echo "Root disk: ${RDISK}"
+echo "Data disk: ${DDISK}"
+echo "Root LUKS: ${ROOTLUKS}"
+echo "Data LUKS: ${DATALUKS}"
+echo "------------------------------------------------"
+
 yes_no_prompt "Does the information above look correct"
 if [[ $REPLY == "n" ]]; then
     echo "Aborting"
-    exit 0
+    exit 1
 fi
 
 loadkeys $KEYMAP
 
-if [[ $UEFI -eq 1 ]]; then
-    boot_partition
-fi
-setup_lvm
+boot_partition
+
+config_disks
 setup_luks
-format_root
-if [[ $MKSWAP == 1 ]]; then
-    create_swap
-fi
-if [[ $DDISK != "none" ]]; then
-    format_data
-fi
+setup_btrfs
+mount_filesytems
 bootstrap
 
 cp ./chroot.sh /mnt/
 cp ./config.sh /mnt/
 
-chroot /mnt ./chroot.sh $RDISK $USR $BOOT
+chroot /mnt ./chroot.sh $RDISK $ROOT $BOOT $DATA $USR
 
 # cleanup
 rm /mnt/chroot.sh /mnt/config.sh
-
-echo
-echo "If there is anything else you would like to do run:"
-echo "chroot /mnt /bin/bash"
 
 if [[ $DDISK != "none" ]]; then
     echo "Don't forget to setup /etc/crypttab and dracut"
