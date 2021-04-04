@@ -13,6 +13,11 @@ dhcpcd $INTERFACE
 chown root:root /
 chmod 755 /
 
+# disable copy on write for the vms folder
+if [[ $DATA != "" ]]; then
+    chattr +C /mnt/vault/vms
+fi
+
 echo "Setting timezone to ${TIMEZONE}"
 ln -s /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 
@@ -58,12 +63,10 @@ echo "Setting up /etc/rc.conf"
 echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
-if [[ $UEFI -eq 1 ]]; then
-    uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
-    # install and configure refind
-    refind-install
-    echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${LUKSNAME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
-fi
+# install and configure refind
+uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
+refind-install
+echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${LUKSNAME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 
 # setup extra repos
 xbps-install -Sy $REPOS
