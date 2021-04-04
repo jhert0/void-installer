@@ -1,6 +1,6 @@
 # void-installer
 
-Install script for Void Linux. This install script will create an encrypted install using LVM and LUKS. You can optionally setup a data drive that is also encrypted. 
+Install script for Void Linux. This install script will create an encrypted install using btrfs and LUKS. You can optionally setup a data drive that is also encrypted. 
 
 ## Usage
 
@@ -28,31 +28,22 @@ Included in this repo is a configuration file where you can change things such a
 ## Defaults
 ### Hard Drives
 
-This is what the script will create on the LVM partition using the default configuration.
+The following will be created on the btrfs partition on the root disk:
 
-There will be 2 physical volumes created in the volume group called `volume`.
+| name  | path  |
+|-------|-------|
+| @     | /     |
+| @home | /home |
 
-| name | volume group |
-|------|--------------|
-| main | volume       |
-| data | volume       |
+Subvolumes will also be created at /var/log /var/cache /var/tmp on the @
+subvolume.
 
-There will be up to 3 logical volumes created. The root and swap will be on the main physical volume and the data logical volume will be created on the data physical volume. Swap is optional but by default it it will be created, change the `MKSWAP` variable to 0 to disable creating the swap.
+The following will be created on the btrfs partition on the data disk:
 
-| name            | size     | physical volume  |
-|-----------------|----------|------------------|
-| root            | 100%FREE | /dev/mapper/main |
-| swap (optional) | 4GB      | /dev/mapper/main |
-| data (optional) | 100%FREE | /dev/mapper/data |
+| name       | path           |
+|------------|----------------|
+| @snapshots | /mnt/snapshots |
+| @vault     | /mnt/vault     |
 
-### Bootloader
-
-The script is set to install rEFInd by default, if you would like to use GRUB change the UEFI variable in config.sh to 0.
-
-#### rEFInd
-
-Nothing should need to be done after rEFInd is installed.
-
-#### GRUB
-
-GRUB currently only supports luks1, support for luks2 has been added to GRUB but it has not been released yet. The script will automatically switch to luks1 when GRUB is going to be installed, this will be removed once support for luks2 has been released. GRUB may also require additional configuration after the script finishes, support for GRUB is still being worked on.
+Subvolumes will also be created at /mnt/vault/vms and /mnt/vault/storage
+on the @vault subvolume.

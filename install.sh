@@ -170,7 +170,7 @@ bootstrap(){
         repo="$REPO/current/musl/"
     fi
 
-    xbps-install -Sy -R $repo -r /mnt base-system btrfs-progs cryptsetup ntp refind
+    xbps-install -Sy -R $repo -r /mnt base-system btrfs-progs cryptsetup ntp refind vim
     xbps-reconfigure -r /mnt -f base-files
     chroot /mnt xbps-reconfigure -a
 }
