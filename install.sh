@@ -90,11 +90,10 @@ setup_luks(){
 }
 
 mount_filesytems(){
-    mkdir -p /mnt/{boot,dev,proc,sys,home,mnt,.snapshots}
+    mkdir -p /mnt/{boot,dev,proc,sys,home,mnt,var}
 
     mount -o $BTRFS_OPTS,subvol=@ $ROOT /mnt
     mount -o $BTRFS_OPTS,subvol=@home $ROOT /mnt/home
-    mount -o $BTRFS_OPTS,subvol=@snapshots $ROOT /mnt/.snapshots
 
     # create seperate subvolumes for log, cache, and tmp to prevent them
     # from being in snapshots of the root subvolume
@@ -113,7 +112,7 @@ mount_filesytems(){
         mkdir -p /mnt/root
         mv data.key /mnt/root
 
-        mkdir /mnt/mnt/{vault,snapshots}
+        mkdir -p /mnt/mnt/{vault,snapshots}
         mount -o $BTRFS_OPTS,subvol=@vault /mnt/mnt/vault
         mount -o $BTRFS_OPTS,subvol=@snapshots /mnt/mnt/snapshots
 
