@@ -90,9 +90,10 @@ setup_luks(){
 }
 
 mount_filesytems(){
+    mount -o $BTRFS_OPTS,subvol=@ $ROOT /mnt
+
     mkdir -p /mnt/{boot,dev,proc,sys,home,mnt,var}
 
-    mount -o $BTRFS_OPTS,subvol=@ $ROOT /mnt
     mount -o $BTRFS_OPTS,subvol=@home $ROOT /mnt/home
 
     # create seperate subvolumes for log, cache, and tmp to prevent them
