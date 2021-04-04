@@ -1,4 +1,4 @@
-MKSWAP=1
+MKSWAP=0
 MUSL=0
 
 ROOTLUKS="tank"

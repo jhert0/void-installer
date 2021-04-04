@@ -39,8 +39,7 @@ xbps-reconfigure -f glibc-locales
 echo "Setting up /etc/fstab"
 
 echo "${ROOT}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
-echo "${ROOT}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" > /etc/fstab
-echo "${ROOT}  /.snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" > /etc/fstab
+echo "${ROOT}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" >> /etc/fstab
 echo "${BOOT}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
 
 if [[ $MKSWAP == 1 ]]; then
@@ -48,7 +47,8 @@ if [[ $MKSWAP == 1 ]]; then
 fi
 
 if [[ $DATA != "" ]]; then
-    echo "${DATA}  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
+    echo "${DATA}  /mnt/vault  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
+    echo "${ROOT}  /mnt/snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" >> /etc/fstab
     echo "data ${DATA} /root/data.key" > /etc/crypttab
 fi
 
