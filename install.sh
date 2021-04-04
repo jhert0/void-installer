@@ -114,8 +114,8 @@ mount_filesytems(){
         mv data.key /mnt/root
 
         mkdir -p /mnt/mnt/{vault,snapshots}
-        mount -o $BTRFS_OPTS,subvol=@vault /mnt/mnt/vault
-        mount -o $BTRFS_OPTS,subvol=@snapshots /mnt/mnt/snapshots
+        mount -o $BTRFS_OPTS,subvol=@vault $DATA /mnt/mnt/vault
+        mount -o $BTRFS_OPTS,subvol=@snapshots $DATA /mnt/mnt/snapshots
 
         btrfs subvolume create /mnt/mnt/vault/storage
         btrfs subvolume create /mnt/mnt/vault/vms
