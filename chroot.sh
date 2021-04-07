@@ -43,18 +43,18 @@ xbps-reconfigure -f glibc-locales
 # setup fstab
 echo "Setting up /etc/fstab"
 
-echo "${ROOT}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
-echo "${ROOT}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" >> /etc/fstab
-echo "${BOOT}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+root_uuid=$(blkid $ROOT --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
+boot_uuid=$(blkid $BOOT --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
 
-if [[ $MKSWAP == 1 ]]; then
-    echo "${SWAP}  none  swap  defaults  0 0" >> /etc/fstab
-fi
+echo "UUID=${root_uuid}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
+echo "UUID=${root_uuid}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" >> /etc/fstab
+echo "UUID=${boot_uuid}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
 
 if [[ $DATA != "" ]]; then
-    echo "${DATA}  /mnt/vault  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
-    echo "${ROOT}  /mnt/snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" >> /etc/fstab
-    echo "data ${DATA} /root/data.key" > /etc/crypttab
+    data_uuid=$(blkid $DATA --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
+    echo "UUID=${data_uuid}  /mnt/vault  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
+    echo "UUID=${data_uuid}  /mnt/snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" >> /etc/fstab
+    echo "data UUID=${data_uuid} /root/data.key" > /etc/crypttab
 fi
 
 echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
@@ -64,9 +64,8 @@ echo "TIMEZONE=${TIMEZONE}" > /etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
 # install and configure refind
-uuid=`ls -l /dev/disk/by-uuid/ | grep $(basename $RDISK) | awk '{print $9}' | tr -d '\n'`
 refind-install
-echo "\"Boot with standard options\" \"cryptdevice=UUID=${uuid}:${LUKSNAME} root=${ROOT} rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
+echo "\"Boot with standard options\" \"root=UUID=${root_uuid} rootflags=subvol=@ rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 
 # setup extra repos
 xbps-install -Sy $REPOS

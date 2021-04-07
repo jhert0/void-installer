@@ -4,7 +4,7 @@ MUSL=0
 ROOTLUKS="tank"
 DATALUKS="data"
 
-BTRFS_OPTS="rw,noatime,compress=zstd,space_cache,commit=120"
+BTRFS_OPTS="rw,noatime,compress=zstd,space_cache"
 
 INTERFACE="eno1"
 
