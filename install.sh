@@ -130,7 +130,7 @@ setup_btrfs(){
     btrfs subvolume create /mnt/@home
     umount /mnt
 
-    if [[ $DDISK != "" ]]; then
+    if [[ $DDISK != "none" ]]; then
         mkfs.btrfs -L data -d single -m dup $DATA
 
         mount -o $BTRFS_OPTS $DATA /mnt
