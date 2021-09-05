@@ -17,7 +17,7 @@ KEYMAP="us"
 REPO="http://alpha.us.repo.voidlinux.org"
 REPOS="void-repo-multilib void-repo-multilib-nonfree void-repo-nonfree"
 
-DE="xfce4"
+DE="xfce4 xorg xinit"
 DE_EXTRAS="xfce4-whiskermenu-plugin xfce4-pulseaudio-plugin libreoffice pinentry-gtk gnome-disk-utility greybird-themes connman-gtk firefox alacritty mpv sxiv"
 
 SHELL="zsh"

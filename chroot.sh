@@ -46,15 +46,15 @@ echo "Setting up /etc/fstab"
 root_uuid=$(blkid $ROOT --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
 boot_uuid=$(blkid $BOOT --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
 
-echo "UUID=${root_uuid}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
-echo "UUID=${root_uuid}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" >> /etc/fstab
-echo "UUID=${boot_uuid}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
+echo "${root_uuid}  / btrfs  $BTRFS_OPTS,subvol=@ 0 1" > /etc/fstab
+echo "${root_uuid}  /home btrfs  $BTRFS_OPTS,subvol=@home 0 1" >> /etc/fstab
+echo "${boot_uuid}  /boot  vfat  rw,relatime  0 0" >> /etc/fstab
 
 if [[ $DATA != "" ]]; then
     data_uuid=$(blkid $DATA --output export | grep "UUID=" | cut -d ' ' -f 2 | tr -d ' ')
-    echo "UUID=${data_uuid}  /mnt/vault  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
-    echo "UUID=${data_uuid}  /mnt/snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" >> /etc/fstab
-    echo "data UUID=${data_uuid} /root/data.key" > /etc/crypttab
+    echo "${data_uuid}  /mnt/vault  btrfs $BTRFS_OPTS,subvol=@vault  0 1" >> /etc/fstab
+    echo "${data_uuid}  /mnt/snapshots btrfs  $BTRFS_OPTS,subvol=@snapshots 0 1" >> /etc/fstab
+    echo "data ${data_uuid} /root/data.key" > /etc/crypttab
 fi
 
 echo "tmpfs  /tmp  tmpfs  defaults,nosuid,nodev  0 0" >> /etc/fstab
@@ -65,7 +65,7 @@ echo "KEYMAP=${KEYMAP}" >> /etc/rc.conf
 
 # install and configure refind
 refind-install
-echo "\"Boot with standard options\" \"root=UUID=${root_uuid} rootflags=subvol=@ rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
+echo "\"Boot with standard options\" \"root=${root_uuid} rootflags=subvol=@ rw quiet initrd=/initramfs-%v.img rd.auto=1 init=/sbin/init vconsole.unicode=1 vconsole.keymap=${KEYMAP}\"" > /boot/refind_linux.conf
 
 # setup extra repos
 xbps-install -Sy $REPOS
